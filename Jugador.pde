@@ -190,6 +190,10 @@ void keyPressed() {
     gestorMinijuegos.solicitarSalida();
     return;
   }
+  if (transicionEncendido) {
+    jugador.detenerMovimiento();
+    return;
+  }
   if (pantalla == 2 && gestorMinijuegos.activo != 0) {
     gestorMinijuegos.teclear(key,keyCode);
     return;
