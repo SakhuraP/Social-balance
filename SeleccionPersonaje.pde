@@ -37,6 +37,6 @@ void seleccionarPersonajeConClick() {
   }
   if(personajeSeleccionado>=1 && personajeSeleccionado<=personajes.length && sobreSeleccion(490,605,300,60)) {
     jugador.cargarPersonaje(personajeSeleccionado);
-    pantalla=2;
+    iniciarTransicionEncendido();
   }
 }
