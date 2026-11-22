@@ -51,6 +51,7 @@ void boton(String texto, float x, float y) {
 
 void mousePressed() {
   if (!mouseDentroDelJuego()) return;
+  if (transicionEncendido) return;
 
   // ================= MENÚ PRINCIPAL =================
 
@@ -99,7 +100,7 @@ void mouseDragged() {
 }
 
 void mouseReleased() {
-  if (pantalla!=2 || gestorMinijuegos.modalAbierto()) return;
+  if (pantalla!=2 || transicionEncendido || gestorMinijuegos.modalAbierto()) return;
   if (gestorMinijuegos.activo==5) {
     gestorMinijuegos.vistaOrdenarPasos.soltar(mouseJuegoX(),mouseJuegoY());
   } else if (gestorMinijuegos.activo==3) {
