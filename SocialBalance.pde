@@ -16,6 +16,11 @@ int pantalla = 0;
 // 1 = Selección de personaje
 // 2 = Nivel 1
 
+// Transición de encendido tipo monitor, al entrar al cuarto.
+final int DURACION_TRANSICION_ENCENDIDO = 1250;
+boolean transicionEncendido = false;
+long inicioTransicionEncendido = 0;
+
 int personajeSeleccionado = 0;
 // 0 = Ninguno, 1 = Chico, 2 = Chica, 3 = NoBin
 
@@ -115,7 +120,7 @@ void dibujarJuego() {
 
     // ================= JUGADOR =================
 
-    boolean puedeMoverse = !hayInterfazAbierta() && focused;
+    boolean puedeMoverse = !transicionEncendido && !hayInterfazAbierta() && focused;
 
     if (puedeMoverse) {
       jugador.actualizar();
@@ -149,6 +154,9 @@ void dibujarJuego() {
     gestorMinijuegos.mostrar();
   }
 
+  // Efecto de encendido del monitor que revela la escena del cuarto.
+  if (transicionEncendido) dibujarTransicionEncendido();
+
   // mostrarCoordenadas();
 
   if (modoDebug) {
@@ -156,6 +164,46 @@ void dibujarJuego() {
   }
 }
 
+void iniciarTransicionEncendido() {
+  pantalla = 2;
+  jugador.detenerMovimiento();
+  inicioTransicionEncendido = millis();
+  transicionEncendido = true;
+}
+
+void dibujarTransicionEncendido() {
+  float progreso = constrain(
+    (millis() - inicioTransicionEncendido) / (float)DURACION_TRANSICION_ENCENDIDO,
+    0, 1
+  );
+  float suave = progreso * progreso * (3 - 2 * progreso);
+  float altoVisible = max(2, ALTO_JUEGO * suave);
+  float bordeSuperior = (ALTO_JUEGO - altoVisible) / 2;
+  float brillo = 1 - progreso;
+
+  pushStyle();
+  rectMode(CORNER);
+  noStroke();
+
+  // La pantalla comienza negra y se abre desde una línea horizontal central.
+  fill(0);
+  rect(0, 0, ANCHO_JUEGO, bordeSuperior);
+  rect(0, bordeSuperior + altoVisible, ANCHO_JUEGO,
+       ALTO_JUEGO - bordeSuperior - altoVisible);
+
+  // Resplandor azulado en los bordes, como un monitor encendiéndose.
+  fill(110, 220, 255, 190 * brillo);
+  rect(0, bordeSuperior - 2, ANCHO_JUEGO, 4);
+  rect(0, bordeSuperior + altoVisible - 2, ANCHO_JUEGO, 4);
+
+  // Destello blanco de la línea central que desaparece al revelarse el cuarto.
+  float altoDestello = max(2, 14 * brillo);
+  fill(255, 255, 255, 220 * brillo);
+  rect(0, ALTO_JUEGO / 2 - altoDestello / 2, ANCHO_JUEGO, altoDestello);
+  popStyle();
+
+  if (progreso >= 1) transicionEncendido = false;
+}
 
 
 void mostrarCuadricula() {
@@ -227,5 +275,6 @@ void mostrarCuadricula() {
 //   fill(255);
 //   textAlign(LEFT, CENTER);
 //   textSize(18);
+//
 //   text("X: " + mouseJuegoX() + " Y: " + mouseJuegoY(), 20, 32);
 // }
